@@ -17,6 +17,7 @@ import usePrevious from 'effects/use-previous';
 import Nag from 'component/common/nag';
 import REWARDS from 'rewards';
 import usePersistedState from 'effects/use-persisted-state';
+import LoadingBar from 'react-top-loading-bar';
 import FileDrop from 'component/fileDrop';
 import NagContinueFirstRun from 'component/nagContinueFirstRun';
 import Spinner from 'component/spinner';
@@ -120,6 +121,7 @@ function App(props: Props) {
   } = props;
 
   const appRef = useRef();
+  const loadingBarRef = useRef();
   const isEnhancedLayout = useKonamiListener();
   const [hasSignedIn, setHasSignedIn] = useState(false);
   const [readyForSync, setReadyForSync] = useState(false);
@@ -381,7 +383,8 @@ function App(props: Props) {
         />
       ) : (
         <React.Fragment>
-          <Router />
+          <Router loadingBar={loadingBarRef} />
+          {<LoadingBar ref={loadingBarRef} loaderSpeed={10} transitionTime={10} />}
           <ModalRouter />
           <FileDrop />
           <FileRenderFloating />

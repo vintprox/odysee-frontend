@@ -89,6 +89,7 @@ type Props = {
   setReferrer: (string) => void,
   hasUnclaimedRefereeReward: boolean,
   homepageData: any,
+  loadingBar?: any,
 };
 
 type PrivateRouteProps = Props & {
@@ -128,6 +129,8 @@ function AppRouter(props: Props) {
     hasUnclaimedRefereeReward,
     setReferrer,
     homepageData,
+    loadingBar,
+    location,
   } = props;
   const { entries, listen, action: historyAction } = history;
   const entryIndex = history.index;
@@ -138,6 +141,20 @@ function AppRouter(props: Props) {
   const dynamicRoutes = Object.values(homepageData).filter(
     (potentialRoute: any) => potentialRoute && potentialRoute.route
   );
+
+  console.log('router:', props);
+  const isPathResolved = history.location.pathname === location.pathname;
+
+  useEffect(() => {
+    return () => {
+      if (history.action === 'POP' || history.action === 'PUSH') {
+        if (loadingBar && loadingBar.current) {
+          console.log('start');
+          loadingBar.current.staticStart();
+        }
+      }
+    };
+  }, [history.action, history.location]);
 
   // For people arriving at settings page from deeplinks, know whether they can "go back"
   useEffect(() => {
@@ -197,6 +214,47 @@ function AppRouter(props: Props) {
       }
     }
   }, [currentScroll, pathname, search, hash, resetScroll, hasLinkedCommentInUrl, historyAction]);
+
+  // useEffect(() => {
+  //   if (loadingBar && loadingBar.current) {
+  //     console.log('hasNavigated:', hasNavigated);
+  //     if (hasNavigated) {
+  //       loadingBar.current.continuousStart();
+  //     } else {loadingBar.current.complete();
+  //     }
+  //   }
+  // }, [hasNavigated]);
+
+  // useEffect(() => {
+  //   console.log('isPathResolved:', isPathResolved);
+  //   if (loadingBar && loadingBar.current) {
+  //     if (isPathResolved) {
+  //       console.log('  stop');
+  //       loadingBar.current.complete();
+  //     } else {
+  //       console.log('  start');
+  //       loadingBar.current.continuousStart();
+  //     }
+  //   }
+  // }, [isPathResolved]);
+
+  // useEffect(() => {
+  //   console.log('isPathResolved:', isPathResolved);
+  //   if (loadingBar && loadingBar.current) {
+  //     if (isPathResolved) {
+  //       console.log('  stop');
+  //       loadingBar.current.complete();
+  //     }
+  //   }
+  // }, [isPathResolved]);
+
+  useEffect(() => {
+    console.log('router done');
+    if (isPathResolved && loadingBar && loadingBar.current) {
+      console.log('stop');
+      loadingBar.current.complete();
+    }
+  });
 
   // react-router doesn't decode pathanmes before doing the route matching check
   // We have to redirect here because if we redirect on the server, it might get encoded again
