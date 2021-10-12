@@ -33,7 +33,7 @@ function getThumbnailCdnUrl(url) {
     return url;
   }
   if (url) {
-    return `${THUMBNAIL_CARDS_CDN_URL}${btoa(url)}.jpg`;
+    return url;
   }
 }
 
