@@ -92,6 +92,7 @@ function CommentList(props: Props) {
   const DEFAULT_SORT = ENABLE_COMMENT_REACTIONS ? SORT_BY.POPULARITY : SORT_BY.NEWEST;
   const [sort, setSort] = usePersistedState('comment-sort-by', DEFAULT_SORT);
   const [page, setPage] = React.useState(0);
+  const [commentsToDisplay, setCommentsToDisplay] = React.useState(resolvedComments);
   const fetchedCommentsOnce = useFetched(isFetchingComments);
   const fetchedReactsOnce = useFetched(isFetchingReacts);
   const fetchedLinkedComment = useFetched(isFetchingCommentsById);
@@ -101,6 +102,8 @@ function CommentList(props: Props) {
   const channelId = getChannelIdFromClaim(claim);
   const channelSettings = channelId ? settingsByChannelId[channelId] : undefined;
   const moreBelow = page < topLevelTotalPages;
+  const isResolvingComments = topLevelComments && resolvedComments.length !== topLevelComments.length;
+  const canDisplayComments = topLevelComments && commentsToDisplay.length === topLevelComments.length;
 
   // Display comments immediately if not fetching reactions
   // If not, wait to show comments until reactions are fetched
@@ -211,20 +214,33 @@ function CommentList(props: Props) {
     }
 
     const handleCommentScroll = debounce(() => {
-      if (hasDefaultExpansion && shouldFetchNextPage(page, topLevelTotalPages, window, document)) {
+      if (
+        hasDefaultExpansion &&
+        !isFetchingComments &&
+        canDisplayComments &&
+        readyToDisplayComments &&
+        moreBelow &&
+        shouldFetchNextPage(page, topLevelTotalPages, window, document)
+      ) {
         setPage(page + 1);
       }
     }, DEBOUNCE_SCROLL_HANDLER_MS);
 
-    if (!isFetchingComments && readyToDisplayComments && moreBelow && spinnerRef && spinnerRef.current) {
-      if (shouldFetchNextPage(page, topLevelTotalPages, window, document, 0)) {
-        setPage(page + 1);
-      } else {
-        window.addEventListener('scroll', handleCommentScroll);
-        return () => window.removeEventListener('scroll', handleCommentScroll);
-      }
-    }
-  }, [hasDefaultExpansion, isFetchingComments, moreBelow, page, readyToDisplayComments, topLevelTotalPages]);
+    window.addEventListener('scroll', handleCommentScroll);
+    return () => window.removeEventListener('scroll', handleCommentScroll);
+  }, [
+    canDisplayComments,
+    hasDefaultExpansion,
+    isFetchingComments,
+    moreBelow,
+    page,
+    readyToDisplayComments,
+    topLevelTotalPages,
+  ]);
+
+  useEffect(() => {
+    if (!isResolvingComments) setCommentsToDisplay(resolvedComments);
+  }, [isResolvingComments, resolvedComments]);
 
   // Batch resolve comment channel urls
   useEffect(() => {
@@ -309,7 +325,7 @@ function CommentList(props: Props) {
             })}
           >
             {readyToDisplayComments && pinnedComments && getCommentElems(pinnedComments)}
-            {readyToDisplayComments && resolvedComments && getCommentElems(resolvedComments)}
+            {readyToDisplayComments && commentsToDisplay && getCommentElems(commentsToDisplay)}
           </ul>
 
           {!hasDefaultExpansion && (
@@ -333,7 +349,7 @@ function CommentList(props: Props) {
             </div>
           )}
 
-          {(isFetchingComments || (hasDefaultExpansion && moreBelow)) && (
+          {(isFetchingComments || (hasDefaultExpansion && moreBelow) || !canDisplayComments) && (
             <div className="main--empty" ref={spinnerRef}>
               <Spinner type="small" />
             </div>
