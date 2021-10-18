@@ -31,6 +31,14 @@ import {
 } from 'web/effects/use-degraded-performance';
 // @endif
 import LANGUAGE_MIGRATIONS from 'constants/language-migrations';
+import CookieConsent from 'react-cookie-consent';
+import {CmpApi} from '@iabtcf/cmpapi';
+
+
+
+// const cmpApi = new CmpApi(1, 3, true);
+console.log(CmpApi);
+window.cmpApi = CmpApi;
 
 const FileDrop = lazyImport(() => import('component/fileDrop' /* webpackChunkName: "secondary" */));
 const ModalRouter = lazyImport(() => import('modal/modalRouter' /* webpackChunkName: "secondary" */));
@@ -339,7 +347,7 @@ function App(props: Props) {
         // $FlowFixMe
         document.body.removeChild(script);
       };
-  });
+  }, [] );
   // @endif
 
   // @if TARGET='app'
@@ -491,6 +499,11 @@ function App(props: Props) {
               <NagDataCollection onClose={handleAnalyticsDismiss} />
             )}
             {user === null && <NagNoUser />}
+            {/* TODO: pull out into own component */}
+            <CookieConsent
+              enableDeclineButton
+              flipButtons
+            >This website uses cookies to enhance the user experience and in display of advertisements.</CookieConsent>
             {/* @endif */}
           </React.Suspense>
         </React.Fragment>
