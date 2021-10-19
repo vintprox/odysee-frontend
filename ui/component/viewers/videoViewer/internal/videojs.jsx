@@ -561,7 +561,7 @@ export default React.memo<Props>(function VideoJs(props: Props) {
       const macroUrl =
         `https://vast.aniview.com/api/adserver61/vast/` +
         `?AV_PUBLISHERID=60afcbc58cfdb065440d2426` +
-        `&AV_CHANNELID=60b354389c7adb506d0bd9a4` +
+        `&AV_CHANNELID=612fb75a42715a07645a614c` +
         `&AV_URL=[URL]` +
         `&cb=[CACHEBUSTING]` +
         `&AV_WIDTH=[WIDTH]` +
@@ -592,8 +592,43 @@ export default React.memo<Props>(function VideoJs(props: Props) {
         player.ima({
           adTagUrl: macroUrl,
           vpaidMode: 2, // 2 = INSECURE
+          adsManagerLoadedCallback: setupIMAEvents,
           // // $FlowFixMe
           // vpaidMode: google.ima.ImaSdkSettings.VpaidMode.INSECURE,
+        });
+
+        // eslint-disable-next-line no-undef
+        var googleAdEvent = google.ima.AdEvent.Type;
+
+        var events = [
+          googleAdEvent.ALL_ADS_COMPLETED,
+          googleAdEvent.CLICK,
+          googleAdEvent.COMPLETE,
+          googleAdEvent.FIRST_QUARTILE,
+          googleAdEvent.LOADED,
+          googleAdEvent.MIDPOINT,
+          googleAdEvent.PAUSED,
+          googleAdEvent.RESUMED,
+          googleAdEvent.STARTED,
+          googleAdEvent.THIRD_QUARTILE,
+        ];
+
+        // eslint-disable-next-line no-inner-declarations
+        function setupIMAEvents(){
+          for (var index = 0; index < events.length; index++) {
+            player.ima.addEventListener(
+              events[index],
+              function(event) {
+                console.log(events[index]);
+                console.log(event);
+              }
+            );
+          }
+        }
+
+        player.on('adserror', function (event) {
+          console.log('ads error');
+          console.log(event);
         });
       }
 
