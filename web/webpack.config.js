@@ -5,9 +5,10 @@ const merge = require('webpack-merge');
 const baseConfig = require('../webpack.base.config.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WriteFilePlugin = require('write-file-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AfterBuildPlugin = require('@fiverr/afterbuild-webpack-plugin');
 const { DefinePlugin, ProvidePlugin } = require('webpack');
 const SentryWebpackPlugin = require('@sentry/webpack-plugin');
-const { getJsBundleId } = require('./bundle-id.js');
 const { insertToHead, buildHead } = require('./src/html');
 const { insertVariableXml, getOpenSearchXml } = require('./src/xml');
 
@@ -19,19 +20,9 @@ const WEB_STATIC_ROOT = path.resolve(__dirname, 'static/');
 const WEB_PLATFORM_ROOT = __dirname;
 const isProduction = process.env.NODE_ENV === 'production';
 const hasSentryToken = process.env.SENTRY_AUTH_TOKEN !== undefined;
-const jsBundleId = getJsBundleId();
 
 // copy static files to dist folder
 const copyWebpackCommands = [
-  {
-    from: `${STATIC_ROOT}/index-web.html`,
-    to: `${DIST_ROOT}/index.html`,
-    // add javascript script to index.html, generate/insert metatags
-    transform(content, path) {
-      return insertToHead(content.toString(), buildHead());
-    },
-    force: true,
-  },
   {
     from: `${STATIC_ROOT}/opensearch.xml`,
     to: `${DIST_ROOT}/opensearch.xml`,
@@ -113,6 +104,19 @@ let plugins = [
   new ProvidePlugin({
     __: ['i18n.js', '__'],
   }),
+  new HtmlWebpackPlugin({
+    template: `${STATIC_ROOT}/index-web.html`,
+    filename: `${DIST_ROOT}/index.html`,
+  }),
+  new AfterBuildPlugin(() => {
+    try {
+      const index = fs.readFileSync(`${DIST_ROOT}/index.html`, { encoding: 'utf8' });
+      const tpl = insertToHead(index, buildHead());
+      fs.writeFileSync(`${DIST_ROOT}/index.html`, tpl);
+    } catch (err) {
+      console.error(err.message); // eslint-disable-line no-console
+    }
+  }),
 ];
 
 if (isProduction && hasSentryToken) {
@@ -129,10 +133,10 @@ if (isProduction && hasSentryToken) {
 const webConfig = {
   target: 'web',
   entry: {
-    [`ui-${jsBundleId}`]: '../ui/index.jsx',
+    ui: '../ui/index.jsx',
   },
   output: {
-    filename: '[name].js',
+    filename: '[name]-[hash].js',
     path: path.join(__dirname, 'dist/public/'),
     publicPath: '/public/',
     chunkFilename: '[name]-[chunkhash].js',
@@ -177,6 +181,11 @@ const webConfig = {
       // lbryinc: '../extras/lbryinc',
       electron: `${WEB_PLATFORM_ROOT}/stubs/electron.js`,
       fs: `${WEB_PLATFORM_ROOT}/stubs/fs.js`,
+    },
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
     },
   },
   plugins,

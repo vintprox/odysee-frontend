@@ -22,8 +22,6 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const removeMd = require('remove-markdown');
-const { getJsBundleId } = require('../bundle-id.js');
-const jsBundleId = getJsBundleId();
 const SDK_API_PATH = `${LBRY_WEB_API}/api/v1`;
 const PROXY_URL = `${SDK_API_PATH}/proxy`;
 Lbry.setDaemonConnectionString(PROXY_URL);
@@ -51,9 +49,9 @@ function insertToHead(fullHtml, htmlToInsert) {
   const finalIndex = fullHtml.indexOf(finalStr);
 
   if (beginIndex > -1 && finalIndex > -1 && finalIndex > beginIndex) {
-    return `${fullHtml.slice(0, beginIndex)}${
-      htmlToInsert || buildOgMetadata()
-    }<script src="/public/ui-${jsBundleId}.js" async></script>${fullHtml.slice(finalIndex + finalStr.length)}`;
+    return `${fullHtml.slice(0, beginIndex)}${htmlToInsert || buildOgMetadata()}${fullHtml.slice(
+      finalIndex + finalStr.length
+    )}`;
   }
 }
 
