@@ -48,6 +48,7 @@ let baseConfig = {
               publicPath: path.resolve(__dirname, 'web/dist/public/'),
             },
           },
+          // @todo: continue to use style-loader for local dev
           // { loader: 'style-loader' },
           { loader: 'css-loader' },
           { loader: 'postcss-loader',
