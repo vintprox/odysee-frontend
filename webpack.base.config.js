@@ -10,6 +10,9 @@ const { ifProduction } = getIfUtils(NODE_ENV);
 const UI_ROOT = path.resolve(__dirname, 'ui/');
 const STATIC_ROOT = path.resolve(__dirname, 'static/');
 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 let baseConfig = {
   mode: ifProduction('production', 'development'),
   devtool: ifProduction('source-map', 'eval-cheap-module-source-map'),
@@ -39,11 +42,17 @@ let baseConfig = {
       {
         test: /\.s?css$/,
         use: [
-          { loader: 'style-loader' },
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: path.resolve(__dirname, 'web/dist/public/'),
+            },
+          },
+          // { loader: 'style-loader' },
           { loader: 'css-loader' },
           { loader: 'postcss-loader',
             options: {
-              plugins: function () {
+              plugins: function() {
                 return [ require('postcss-rtl')() ];
               },
             },
@@ -109,6 +118,14 @@ let baseConfig = {
       systemvars: true, // load all the predefined 'process.env' variables which will trump anything local per dotenv specs.
       silent: false, // hide any errors
       defaults: true, // load '.env.defaults' as the default values if empty.
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'base-[contenthash].css',
+      chunkFilename: '[id].css',
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false,
     }),
   ],
 };
