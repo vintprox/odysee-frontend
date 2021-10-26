@@ -16,6 +16,7 @@ import usePrevious from 'effects/use-previous';
 import REWARDS from 'rewards';
 import usePersistedState from 'effects/use-persisted-state';
 import Spinner from 'component/spinner';
+import Nag from 'component/common/nag';
 import LANGUAGES from 'constants/languages';
 // @if TARGET='app'
 import useZoom from 'effects/use-zoom';
@@ -32,25 +33,24 @@ import {
 // @endif
 import LANGUAGE_MIGRATIONS from 'constants/language-migrations';
 
-const FileDrop = lazyImport(() => import('component/fileDrop' /* webpackChunkName: "secondary" */));
-const ModalRouter = lazyImport(() => import('modal/modalRouter' /* webpackChunkName: "secondary" */));
-const Nag = lazyImport(() => import('component/common/nag' /* webpackChunkName: "secondary" */));
+const FileDrop = lazyImport(() => import('component/fileDrop' /* webpackChunkName: "fileDrop" */));
+const ModalRouter = lazyImport(() => import('modal/modalRouter' /* webpackChunkName: "modalRouter" */));
 const NagContinueFirstRun = lazyImport(() =>
-  import('component/nagContinueFirstRun' /* webpackChunkName: "secondary" */)
+  import('component/nagContinueFirstRun' /* webpackChunkName: "nagContinueFirstRun" */)
 );
-const OpenInAppLink = lazyImport(() => import('web/component/openInAppLink' /* webpackChunkName: "secondary" */));
+const OpenInAppLink = lazyImport(() => import('web/component/openInAppLink' /* webpackChunkName: "openInAppLink" */));
 
 // @if TARGET='web'
 const NagDataCollection = lazyImport(() =>
-  import('web/component/nag-data-collection' /* webpackChunkName: "secondary" */)
+  import('web/component/nag-data-collection' /* webpackChunkName: "NagDataCollection" */)
 );
 const NagDegradedPerformance = lazyImport(() =>
-  import('web/component/nag-degraded-performance' /* webpackChunkName: "secondary" */)
+  import('web/component/nag-degraded-performance' /* webpackChunkName: "nagDegradedPerformance" */)
 );
 const NagNoUser = lazyImport(() => import('web/component/nag-no-user' /* webpackChunkName: "nag-no-user" */));
 const NagSunset = lazyImport(() => import('web/component/nag-sunset' /* webpackChunkName: "nag-no-user" */));
 const YoutubeWelcome = lazyImport(() =>
-  import('web/component/youtubeReferralWelcome' /* webpackChunkName: "secondary" */)
+  import('web/component/youtubeReferralWelcome' /* webpackChunkName: "youtubeWelcome" */)
 );
 
 // @endif
