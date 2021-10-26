@@ -1,0 +1,99 @@
+.sticker__selector {
+  animation: menu-animate-in var(--animation-duration) var(--animation-style);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-m);
+
+  .sticker__selector--header {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-s);
+    margin-bottom: 0;
+    align-items: center;
+    padding: var(--spacing-xxs);
+
+    .sticker__selector--title {
+      @extend .card__title-section;
+      @extend .card__title-section--small;
+      padding: 0;
+    }
+  }
+
+  .navigation__wrapper {
+    height: unset;
+    border-left: 1px solid var(--color-border);
+
+    .navigation-links {
+      li {
+        .button {
+          padding: unset;
+
+          .button__content {
+            justify-content: unset;
+            flex-direction: unset;
+            width: unset;
+
+            .button__label {
+              font-size: var(--font-small);
+              margin: 0 var(--spacing-s);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.stickers-list {
+  display: flex;
+
+  .stickers-list__items {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 25vh;
+    padding: var(--spacing-s);
+
+    .button--file-action {
+      width: 5rem;
+      height: 5.3rem;
+      overflow: hidden;
+      margin: unset;
+      padding: var(--spacing-s);
+
+      .button__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .super-chat--light {
+          position: absolute;
+          display: inline;
+          bottom: 0;
+        }
+      }
+
+      .file-price {
+        &::before {
+          left: var(--spacing-s);
+        }
+      }
+
+      @media (max-width: $breakpoint-xsmall) {
+        width: 4rem;
+        height: 4.3rem;
+      }
+    }
+  }
+}
+
+.sticker__comment {
+  margin-left: var(--spacing-m);
+  height: 6rem;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}

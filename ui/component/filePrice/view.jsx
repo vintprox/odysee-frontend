@@ -1,14 +1,13 @@
 // @flow
 import * as ICONS from 'constants/icons';
-import React from 'react';
 import classnames from 'classnames';
 import CreditAmount from 'component/common/credit-amount';
 import Icon from 'component/common/icon';
+import React from 'react';
 
 type Props = {
   showFullPrice: boolean,
-  costInfo: ?{ includesData: boolean, cost: number },
-  fetchCostInfo: string => void,
+  costInfo?: ?{ includesData: boolean, cost: number },
   uri: string,
   fetching: boolean,
   claim: ?{},
@@ -16,9 +15,11 @@ type Props = {
   claimIsMine: boolean,
   type?: string,
   // below props are just passed to <CreditAmount />
-  inheritStyle?: boolean,
   showLBC?: boolean,
+  isFiat?: boolean,
   hideFree?: boolean, // hide the file price if it's free
+  customPrice: number,
+  doFetchCostInfoForUri: (string) => void,
 };
 
 class FilePrice extends React.PureComponent<Props> {
@@ -35,17 +36,27 @@ class FilePrice extends React.PureComponent<Props> {
   }
 
   fetchCost = (props: Props) => {
-    const { costInfo, fetchCostInfo, uri, fetching, claim } = props;
+    const { costInfo, uri, fetching, claim, doFetchCostInfoForUri } = props;
 
-    if (costInfo === undefined && !fetching && claim) {
-      fetchCostInfo(uri);
+    if (uri && costInfo === undefined && !fetching && claim) {
+      doFetchCostInfoForUri(uri);
     }
   };
 
   render() {
-    const { costInfo, showFullPrice, showLBC, hideFree, claimWasPurchased, type, claimIsMine } = this.props;
+    const {
+      costInfo,
+      showFullPrice,
+      showLBC,
+      isFiat,
+      hideFree,
+      claimWasPurchased,
+      type,
+      claimIsMine,
+      customPrice,
+    } = this.props;
 
-    if (claimIsMine || !costInfo || !costInfo.cost || (!costInfo.cost && hideFree)) {
+    if (!customPrice && (claimIsMine || !costInfo || !costInfo.cost || (!costInfo.cost && hideFree))) {
       return null;
     }
 
@@ -66,9 +77,10 @@ class FilePrice extends React.PureComponent<Props> {
         })}
         showFree
         showLBC={showLBC}
-        amount={costInfo.cost}
-        isEstimate={!costInfo.includesData}
+        amount={costInfo ? costInfo.cost : customPrice}
+        isEstimate={!!costInfo && !costInfo.includesData}
         showFullPrice={showFullPrice}
+        isFiat={isFiat}
       />
     );
   }
