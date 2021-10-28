@@ -61,8 +61,15 @@ export default () => {
     );
   };
 
+  const test = () => {
+    return (async () => {
+      const t = pushSupported && (await navigator.serviceWorker?.getRegistrations().length) > 0;
+      return t;
+    })();
+  };
+
   return {
-    pushSupported,
+    pushSupported: test(),
     pushEnabled,
     pushPermission,
     pushToggle,
