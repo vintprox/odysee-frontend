@@ -2,11 +2,11 @@ const path = require('path');
 const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 const { DefinePlugin } = require('webpack');
-const { getIfUtils } = require('webpack-config-utils');
+// const { getIfUtils } = require('webpack-config-utils');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const { ifProduction } = getIfUtils(NODE_ENV);
+const ifProduction = 'development';
 const UI_ROOT = path.resolve(__dirname, 'ui/');
 const STATIC_ROOT = path.resolve(__dirname, 'static/');
 
@@ -16,14 +16,14 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 let baseConfig = {
   mode: ifProduction('production', 'development'),
   devtool: ifProduction('source-map', 'eval-cheap-module-source-map'),
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        parallel: true,
-        sourceMap: true,
-      }),
-    ],
-  },
+  // optimization: {
+  //   minimizer: [
+  //     new TerserPlugin({
+  //       parallel: true,
+  //       sourceMap: true,
+  //     }),
+  //   ],
+  // },
   node: {
     __dirname: false,
   },
